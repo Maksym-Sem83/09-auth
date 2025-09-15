@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/store/authStore";
-import { getUserProfile, checkSession } from "@/lib/api/clientApi";
+import { getUserProfile } from "@/lib/api/clientApi";
 import Loader from "@/app/loading";
 
 const PUBLIC_ROUTES = ["/sign-in", "/sign-up"];
@@ -22,12 +22,13 @@ export default function AuthProvider({
   useEffect(() => {
     async function verifyAuth() {
       try {
-        await checkSession();
         const user = await getUserProfile();
         setUser(user);
 
-        if (PUBLIC_ROUTES.includes(pathname)) router.replace("/profile");
-      } catch (err) {
+        if (PUBLIC_ROUTES.includes(pathname)) {
+          router.replace("/profile");
+        }
+      } catch {
         clearIsAuthenticated();
 
         if (PRIVATE_ROUTES.some((route) => pathname.startsWith(route))) {
@@ -37,16 +38,18 @@ export default function AuthProvider({
         setLoading(false);
       }
     }
+
     verifyAuth();
-  }, [clearIsAuthenticated, pathname, router, setUser]);
+  }, [pathname, router, setUser, clearIsAuthenticated]);
 
   if (loading) return <Loader />;
 
   if (
     !isAuthenticated &&
     PRIVATE_ROUTES.some((route) => pathname.startsWith(route))
-  )
+  ) {
     return null;
+  }
 
   return <>{children}</>;
 }
