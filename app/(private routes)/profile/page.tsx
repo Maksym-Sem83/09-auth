@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 import css from "./ProfilePage.module.css";
 import Link from "next/link";
